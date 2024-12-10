@@ -1,0 +1,6 @@
+"0",""
+"0","cat(""\nFlight that left most ahead of schedule:\n"")"
+"1","
+Flight that left most ahead of schedule:
+"
+"0","print(earliest_departure)"

@@ -1,0 +1,8 @@
+"0",""
+"0","# 2 "
+"0","most_delayed <- flights %>% arrange(desc(arr_delay)) %>% slice(1)"
+"0","earliest_departure <- flights %>% arrange(dep_delay) %>% slice(1)"
+"0",""
+"0","cat(""Most delayed flight details:"")"
+"1","Most delayed flight details:"
+"0","print(most_delayed)"

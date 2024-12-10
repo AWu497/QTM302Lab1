@@ -1,0 +1,6 @@
+"0",""
+"0","cat(""\nCarriers with the Median 2 Average Delays:\n"")"
+"1","
+Carriers with the Median 2 Average Delays:
+"
+"0","print(median_2_delays)"

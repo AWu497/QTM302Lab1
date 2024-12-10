@@ -1,0 +1,106 @@
+---
+title: "Wu_Lab3"
+author: "Andy Wu"
+date: "2024-10-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE)
+rm(list = ls())
+options(scipen=999)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+library(dplyr)
+library(nycflights13)
+library(readr)
+library(tidyr) 
+library(stringr)
+```
+
+## Including Plots
+
+
+
+```{r 5.5.2}
+flights <- flights %>%
+  mutate(dep_time_mins = (dep_time %/% 100) * 60 + (dep_time %% 100),
+         sched_dep_time_mins = (sched_dep_time %/% 100) * 60 + (sched_dep_time %% 100),
+         time_diff = dep_time_mins - sched_dep_time_mins)
+
+# Filter for rows where dep_delay is not NA
+flights_filtered <- flights %>% filter(!is.na(dep_delay))
+
+# Create a tibble with the necessary columns
+flights_summary <- flights_filtered %>%
+  select(carrier, flight, dep_time_mins, sched_dep_time_mins, time_diff, dep_delay) %>%
+  head(5)
+
+# Display the results
+print(flights_summary)
+```
+
+```{r 5.6.7 4}
+# Identify canceled flights and calculate daily statistics
+flights_daily <- flights %>%
+  mutate(cancelled = is.na(dep_delay) | is.na(arr_delay)) %>%
+  group_by(year, month, day) %>%
+  summarize(
+    prop_cancelled = mean(cancelled, na.rm = TRUE),
+    avg_delay = mean(dep_delay, na.rm = TRUE),
+    .groups = "drop" # This removes the grouping after summarizing
+  )
+
+# Specify the directory and filename for the output CSV
+output_path <- "D:/大三上/QTM 302/lab3/Andy_Wu_lab3.csv"
+
+# Write the output to the specified file path
+write.csv(flights_daily, output_path, row.names = FALSE)
+
+
+```
+
+
+```{r 5.6.7 5}
+# Calculate average departure delay for each carrier
+carrier_delays <- flights %>%
+  filter(!is.na(dep_delay)) %>%
+  group_by(carrier) %>%
+  summarize(avg_dep_delay = mean(dep_delay, na.rm = TRUE), .groups = "drop") %>%
+  left_join(airlines, by = "carrier") %>%
+  arrange(avg_dep_delay)
+
+# Select top 2 carriers with the longest delays
+top_2_delays <- carrier_delays %>% 
+  slice_tail(n = 2)
+
+# Select the 2 carriers with the shortest delays
+shortest_2_delays <- carrier_delays %>%
+  slice_head(n = 2)
+
+# Select median 2 carriers
+median_index <- ceiling(nrow(carrier_delays) / 2)
+median_2_delays <- carrier_delays %>%
+  slice((median_index - 1):(median_index))
+
+# Print each result
+cat("Carriers with the Shortest 2 Average Delays:\n")
+print(shortest_2_delays)
+
+cat("\nCarriers with the Median 2 Average Delays:\n")
+print(median_2_delays)
+
+cat("\nCarriers with the Top 2 Longest Average Delays:\n")
+print(top_2_delays)
+
+```
+
